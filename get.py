@@ -1,7 +1,9 @@
-def get_novel(url_prefix, num_chapters, max_retries):
+def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
     import requests
     from bs4 import BeautifulSoup
     import time
+    import tkinter as tk
+    from tkinter import messagebox
 
     # 构造 URL
     url_template = url_prefix + '{}/'
@@ -79,6 +81,10 @@ def get_novel(url_prefix, num_chapters, max_retries):
                 # 将结果写入到txt文件
                 with open(f'{name}.txt', 'a', encoding='utf-8') as f:
                     f.write(f'第{i}章 {title}\n\n{content}\n\n\n')
+                    updata_progress(i)
+                    if num_chapters == i:
+                        messagebox.showinfo('提示', '下载完成！')
+                        init()
 
                 # 跳出重试循环
                 break

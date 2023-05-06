@@ -4,5 +4,10 @@
 
 dist目录下就是打包好的windows可执行文件  
   
+下载时不要修改参数  
   
-还没写完
+打包命令  
+
+`cmd
+pyinstaller --onefile --name myapp main.py -w 
+`
