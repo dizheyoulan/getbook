@@ -1,4 +1,4 @@
-def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
+def get_novel(url_prefix, num_chapters, retries_time,updata_progress,init):
     import requests
     from bs4 import BeautifulSoup
     import time
@@ -8,7 +8,8 @@ def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
     # 构造 URL
     url_template = url_prefix + '{}/'
 
-    # 发送 HTTP 请求并获取响应，设置超时时间为5秒钟
+    max_retries = 5
+    
     for retry in range(max_retries):
         try:
             # 定义请求头信息
@@ -16,13 +17,12 @@ def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
             }
 
-            # 发送 HTTP 请求并获取响应，设置超时时间为5秒钟
-            response = requests.get(url_template.format(1), headers=headers, timeout=5)
+            # 发送 HTTP 请求并获取响应，设置超时时间为6秒钟
+            response = requests.get(url_template.format(1), headers=headers, timeout=6)
 
-            # 如果请求失败，等待5秒钟后重试
             if response.status_code != 200:
-                print(f'请求失败 status为 {response.status_code}, 5秒钟后重试...')
-                time.sleep(5)
+                print(f'请求失败 status为 {response.status_code}, {retries_time}秒钟后重试...')
+                time.sleep(retries_time)
                 continue
 
             # 将响应中的 HTML 数据解析为 BeautifulSoup 对象
@@ -43,13 +43,11 @@ def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
             break
 
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-            # 如果出现网络超时或连接错误，等待5秒钟后重试
-            print(f'网络超时: {e}, 5秒钟后重试...')
-            time.sleep(5)
+            print(f'网络超时: {e}, {retries_time}秒钟后重试...')
+            time.sleep(retries_time)
             continue
 
         except Exception as e:
-            # 如果出现其他异常，打印异常信息并退出程序
             print(f'其他异常: {e}')
             exit()
 
@@ -60,13 +58,12 @@ def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
 
         for retry in range(max_retries):
             try:
-                # 发送 HTTP 请求并获取响应，设置超时时间为5秒钟
-                response = requests.get(url, headers=headers, timeout=5)
-
-                # 如果请求失败，等待5秒钟后重试
+                # 发送 HTTP 请求并获取响应，设置超时时间为6秒钟
+                response = requests.get(url, headers=headers, timeout=6)
+                
                 if response.status_code != 200:
-                    print(f'请求失败 status为 {response.status_code}, 5秒钟后重试...')
-                    time.sleep(5)
+                    print(f'请求失败 status为 {response.status_code}, {retries_time}秒钟后重试...')
+                    time.sleep(retries_time)
                     continue
 
                 # 将响应中的 HTML 数据解析为 BeautifulSoup 对象
@@ -90,12 +87,10 @@ def get_novel(url_prefix, num_chapters, max_retries,updata_progress,init):
                 break
 
             except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
-                # 如果出现网络超时或连接错误，等待5秒钟后重试
-                print(f'网络超时: {e}, 5秒钟后重试...')
-                time.sleep(5)
+                print(f'网络超时: {e}, {retries_time}秒钟后重试...')
+                time.sleep(retries_time)
                 continue
 
             except Exception as e:
-                # 如果出现其他异常，打印异常信息并退出程序
                 print(f'其他异常: {e}')
                 exit()

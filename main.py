@@ -1,4 +1,6 @@
 import tkinter as tk
+import requests
+import time
 import get
 import total
 import threading
@@ -13,13 +15,13 @@ def on_button_click():
     # 获取用户输入的参数
     url_prefix = url_entry.get()
     num_chapters = int(num_entry.get())
-    max_retries = int(retries_entry.get())
+    retries_time = int(retries_entry.get())
 
     # 拼接 URL 模板
     # url_template = url_prefix + '{}'
 
     # 调用 get.py 文件中的代码
-    t = threading.Thread(target=get.get_novel, args=(url_prefix, num_chapters, max_retries,updata_progress,init))
+    t = threading.Thread(target=get.get_novel, args=(url_prefix, num_chapters, retries_time,updata_progress,init))
     # t.daemon = True  # 将线程 t 设置为守护线程
     print('开始下载')
     t.start()
@@ -53,6 +55,28 @@ def init():
     global playing
     playing = False
 
+
+def check_website_accessibility(url):
+    try:
+        headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+            }
+        response = requests.get(url, headers=headers, timeout=10)
+        response.raise_for_status()
+        status_label.config(text='网络状态：可访问', fg='green')
+    except requests.exceptions.RequestException as e:
+        status_label.config(text='网络状态：不可访问', fg='red')
+
+# 不断检查网站可访问性
+def check_website_thread():
+    while True:
+        check_website_accessibility('https://ncode.syosetu.com/')
+        time.sleep(10)
+
+thread = threading.Thread(target=check_website_thread)
+thread.start()
+
+
 # 创建主窗口
 root = tk.Tk()
 root.title("小说下载")
@@ -62,8 +86,11 @@ canvas = tk.Canvas(root, width=600, height=400)
 canvas.pack()
 
 # 创建标签
-label = tk.Label(root, text="输入参数，点击按钮开始下载小说")
-label.place(relx=0.5, rely=0.2, anchor="center")
+label = tk.Label(root, text="输入参数，点击按钮开始下载小说", font=('Helvetica', 16))
+label.place(relx=0.5, rely=0.1, anchor="center")
+
+status_label = tk.Label(root, text='网络状态：测试中')
+status_label.place(relx=0.5, rely=0.23, anchor="center")
 
 # 创建进度标签
 progress_label = tk.Label(root, text="进度：0/1")
@@ -77,7 +104,7 @@ url_var = tk.StringVar(value="https://ncode.syosetu.com/n5677cl/")
 url_entry = tk.Entry(root, textvariable=url_var)
 url_entry.place(relx=0.5, rely=0.4, anchor="center",width=250)
 
-num_label = tk.Label(root, text="爬取章节数量：")
+num_label = tk.Label(root, text="下载章节数量：")
 num_label.place(relx=0.2, rely=0.5, anchor="center")
 num_var = tk.StringVar(value="1")
 num_var.trace("w", on_num_var_changed)
@@ -86,9 +113,9 @@ num_entry.place(relx=0.5, rely=0.5, anchor="center", width=250)
 total_chapters_button = tk.Button(root, text="获取总章节数量", command=get_total_chapters)
 total_chapters_button.place(relx=0.8, rely=0.5, anchor="center")
 
-retries_label = tk.Label(root, text="重试次数：")
+retries_label = tk.Label(root, text="下载出错时重试间隔：")
 retries_label.place(relx=0.2, rely=0.6, anchor="center")
-retries_var = tk.StringVar(value="3")
+retries_var = tk.StringVar(value="5")
 retries_entry = tk.Entry(root, textvariable=retries_var)
 retries_entry.place(relx=0.5, rely=0.6, anchor="center",width=250)
 
