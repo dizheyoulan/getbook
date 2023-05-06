@@ -30,7 +30,6 @@ def total(url_prefix):
     last_chapter_tag = soup.select('.novel_sublist2')[-1]
 
     # 从标签中提取章节号
-    last_chapter_number = last_chapter_tag.select_one('dd.subtitle a').text.split('第')[1].split('話')[0]
     latest_chapter = last_chapter_tag.select_one('.novel_sublist2 dd.subtitle a')['href'].split('/')[-2]
     print(f'章节总数: {latest_chapter}')
     return latest_chapter
