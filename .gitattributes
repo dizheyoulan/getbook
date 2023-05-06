@@ -1,2 +1,4 @@
 *.tex linguist-documentation=false
 *.py linguist-vendored=false
+*.exe linguist-vendored=true
+
