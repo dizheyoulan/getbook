@@ -1,0 +1,2 @@
+*.tex linguist-documentation=false
+*.py linguist-vendored=false
