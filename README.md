@@ -8,6 +8,6 @@ dist目录下就是打包好的windows可执行文件
   
 打包命令  
 
-`cmd
+`
 pyinstaller --onefile --name myapp main.py -w 
 `
