@@ -7,6 +7,6 @@
   
 打包命令  
 
-`
+```bash
 pyinstaller --onefile --name myapp main.py -w 
-`
+```

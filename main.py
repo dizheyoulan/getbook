@@ -56,23 +56,36 @@ def init():
     playing = False
 
 
+# 全局变量，记录失败次数
+failed_attempts = 0
+
+# 检查网站可访问性
 def check_website_accessibility(url):
+    global failed_attempts
+
     try:
         headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
-            }
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'
+        }
         response = requests.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         status_label.config(text='网络状态：可访问', fg='green')
-    except requests.exceptions.RequestException as e:
-        status_label.config(text='网络状态：不可访问', fg='red')
 
-# 不断检查网站可访问性
+        # 如果请求成功，重置失败次数
+        failed_attempts = 0
+    except requests.exceptions.RequestException as e:
+        failed_attempts += 1
+
+        # 连续三次失败则标记为不可访问
+        if failed_attempts >= 3:
+            status_label.config(text='网络状态：不可访问', fg='red')
+
+# 持续检查网站可访问性
 def check_website_thread():
     while True:
         check_website_accessibility('https://ncode.syosetu.com/')
-        time.sleep(10)
 
+# 创建线程并启动
 thread = threading.Thread(target=check_website_thread)
 thread.start()
 
